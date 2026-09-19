@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">{{ student.name }} <span class="text-muted h5">Year {{ student.year_level }}</span></h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('students.edit', student_id=student.id) }}">Edit</a>
+</div>
+<dl class="row" style="max-width: 720px;">
+  <dt class="col-sm-3">Subjects</dt><dd class="col-sm-9">{{ student.subjects or '—' }}</dd>
+  <dt class="col-sm-3">Family contact</dt>
+  <dd class="col-sm-9">
+    {{ student.contact_name or '—' }}
+    {% if student.contact_phone %} &middot; {{ student.contact_phone }}{% endif %}
+    {% if student.contact_email %} &middot; {{ student.contact_email }}{% endif %}
+  </dd>
+  <dt class="col-sm-3">Status</dt>
+  <dd class="col-sm-9">
+    {% if student.status == 'active' %}
+      <span class="badge text-bg-success">active</span>
+    {% else %}
+      <span class="badge text-bg-secondary">inactive</span>
+    {% endif %}
+  </dd>
+</dl>
+
+<h2 class="h5 mt-4">Session history</h2>
+{% if sessions %}
+<div class="table-responsive">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Date</th><th>Time</th><th>Tutor</th><th>Subject</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for sess in sessions %}
+      <tr>
+        <td>{{ sess.session_date }}</td><td>{{ sess.start_time }} ({{ sess.length_minutes }} min)</td>
+        <td>{{ sess.tutor_name }}</td><td>{{ sess.subject }}</td>
+        <td><span class="badge text-bg-secondary">{{ sess.status }}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No sessions recorded yet. The full history view is delivered in RED-10.</p>
+{% endif %}
+{% endblock %}
