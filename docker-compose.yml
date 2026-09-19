@@ -1,0 +1,14 @@
+services:
+  redgum:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_CONFIG: production
+      SECRET_KEY: change-me-via-env
+      DATABASE: /data/redgum.db
+    volumes:
+      - redgum-data:/data
+
+volumes:
+  redgum-data:

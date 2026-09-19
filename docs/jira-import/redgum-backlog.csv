@@ -1,0 +1,201 @@
+﻿Issue Type,Summary,Epic Name,Description,Story Points,Priority,Labels
+Epic,Redgum scheduling core (Sprint 1),Redgum scheduling core (Sprint 1),"Committed Sprint 1 epic: student/tutor records, tutor availability, session booking with the availability rule, and schedule views.",,High,committed-sprint-1
+Epic,Parked product backlog,Parked product backlog,Stakeholder requests explicitly parked out of Sprint 1 with reasons; kept visible for future planning per the case study.,,Low,parked
+Story,"RED-01 Project scaffold, configuration and CI",Redgum scheduling core (Sprint 1),"As a developer, I want a runnable, configured project scaffold with CI, so that the whole team builds on one working baseline.
+
+Acceptance criteria:
+- Application starts from a clean checkout following the README alone
+- Environment-based configuration (dev/test/production) with .env.example
+- GitHub Actions installs dependencies and runs pytest on push and pull requests
+- No secrets, tokens, student IDs or real personal data in the repository
+
+Story point justification: 5 = multi-layer feature touching routes, services and tests",5,High,committed-sprint-1 owner-han
+Story,RED-02 Data model and SQLite persistence,Redgum scheduling core (Sprint 1),"As a developer, I want students, tutors, availability windows and sessions persisted in SQLite, so that data survives application restarts.
+
+Acceptance criteria:
+- Schema for students, tutors, availability_windows and sessions with foreign keys
+- Repository create/read/update functions with required-field validation
+- CHECK constraints for statuses and 60/90 minute session lengths
+- Repository tests demonstrate persistence across a new connection
+
+Story point justification: 5 = multi-layer feature touching routes, services and tests",5,High,committed-sprint-1 owner-max
+Story,RED-03 Tutor availability domain rule with negative tests,Redgum scheduling core (Sprint 1),"As Deb (front desk), I want every proposed booking checked against the tutor's availability windows, so that sessions can never be booked when the tutor is unavailable.
+
+Acceptance criteria:
+- A slot is accepted only when it falls entirely inside one window for that weekday
+- Starting exactly at window open or ending exactly at window close is accepted
+- Bookings before open, after close, across a gap, on an unavailable day, or with a deactivated tutor are refused with a clear reason
+- Automated positive and negative tests cover every case, including moved sessions
+
+Story point justification: 5 = multi-layer feature touching routes, services and tests",5,High,committed-sprint-1 owner-max owner-jiao-tests
+Story,"RED-04 Student records: create, find, edit, deactivate",Redgum scheduling core (Sprint 1),"As Deb, I want to maintain student records with name, year, family contact and subjects, so that student information is correct and available in one place.
+
+Acceptance criteria:
+- Create a student with name, year level, family contact and subjects
+- Missing required fields are named and the record is not saved
+- Find and edit existing students; deactivate a student without deleting history
+- Records persist after restart
+
+Story point justification: 3 = small single-screen change",3,High,committed-sprint-1 owner-han
+Story,"RED-05 Tutor records: create, find, edit, deactivate",Redgum scheduling core (Sprint 1),"As Deb, I want to maintain tutor records and deactivate tutors who leave, so that the tutor list stays current after tutor turnover.
+
+Acceptance criteria:
+- Create a tutor with name and subjects taught
+- Find and edit tutors; deactivate a tutor
+- Deactivated tutors keep historical sessions but disappear from new-booking options
+- Required fields are validated and nothing invalid is saved
+
+Story point justification: 3 = small single-screen change",3,High,committed-sprint-1 owner-han
+Story,RED-06 Maintain tutor availability windows,Redgum scheduling core (Sprint 1),"As Deb, I want to add, change and remove each tutor's weekly availability windows, so that bookings match what tutors agreed, including mid-term amendments.
+
+Acceptance criteria:
+- Add multiple windows per weekday with start and end times
+- Windows can be removed (change = remove then re-add)
+- Weekday 1-7 and HH:MM times validated; end must be after start
+- Windows are shown with the tutor and used by booking validation
+
+Story point justification: 3 = small single-screen change",3,High,committed-sprint-1 owner-han
+Story,RED-07 Book a session with availability check,Redgum scheduling core (Sprint 1),"As Deb, I want to book a session choosing student, tutor, date, start time and 60/90 minute length, so that a correct booking takes under a minute while a parent waits.
+
+Acceptance criteria:
+- Session saves with status booked and appears on that day's schedule
+- Only active students and tutors can be selected; lengths limited to 60 or 90 minutes
+- Bookings outside an availability window are refused with a plain-language reason
+- Missing required fields are named and nothing is saved
+
+Story point justification: 5 = multi-layer feature touching routes, services and tests",5,High,committed-sprint-1 owner-max
+Story,"RED-08 Move, cancel and mark session status",Redgum scheduling core (Sprint 1),"As Deb, I want to reschedule or cancel a session and mark attendance, so that changes, cancellations and no-shows are reliably recorded.
+
+Acceptance criteria:
+- Moving a session re-checks the availability rule on the new slot
+- Cancelling keeps the record visible with status cancelled
+- Booked sessions can be marked attended or missed; cancelled sessions cannot
+- Moving or cancelling one session never changes another session
+
+Story point justification: 3 = small single-screen change",3,High,committed-sprint-1 owner-max
+Story,RED-09 Centre day and week schedule view,Redgum scheduling core (Sprint 1),"As Helen, I want to see the whole centre's sessions for a chosen day or week, so that she can judge tutor utilisation and the day at a glance.
+
+Acceptance criteria:
+- Choose a day or a week and list every session with student, tutor, subject, time, length and status
+- Days with no sessions show an empty state, not an error
+- View is usable at phone width without horizontal scrolling
+
+Story point justification: 3 = small single-screen change",3,Medium,committed-sprint-1 owner-jiao
+Story,RED-10 Tutor upcoming and student history views,Redgum scheduling core (Sprint 1),"As a tutor and a parent, I want tutors see their own upcoming sessions and a student's past/future sessions are visible, so that tutors know their week and Deb answers parent questions immediately.
+
+Acceptance criteria:
+- Tutor view lists only that tutor's upcoming sessions, soonest first, with an empty state
+- Student view lists past and future sessions in date order
+- Cancelled sessions remain visible and are clearly marked
+
+Story point justification: 3 = small single-screen change",3,Medium,committed-sprint-1 owner-jiao
+Story,RED-11 Load case-study seed data and complete mobile usability pass,Redgum scheduling core (Sprint 1),"As the team, I want the paper documents loaded as sample data and a phone-usable interface, so that demonstrations use realistic scenarios and tutors can use their phones.
+
+Acceptance criteria:
+- A single command loads tutors, windows, students and Week 5 sessions from Documents A-C
+- Seeded data matches the case study (Tomas card, diary moves, Kai enrolment)
+- Mobile walkthrough of the core booking flow completes within one minute; defects fixed or logged
+
+Story point justification: 2 = small single-screen change",2,Medium,committed-sprint-1 owner-jiao
+Story,"RED-12 Test plan, cases, traceability and compatibility/usability evidence",Redgum scheduling core (Sprint 1),"As the assessor, I want a complete test workbook and quality evidence, so that delivery quality is independently verifiable.
+
+Acceptance criteria:
+- Test scenarios, test cases, requirements traceability matrix and summary following the provided workbook example
+- Every committed story traced to at least one positive and negative case
+- Browser/device compatibility matrix and usability walkthrough evidence with screenshots
+- Defect log with retesting; CI green; no critical defects open
+
+Story point justification: 5 = multi-layer feature touching routes, services and tests",5,High,committed-sprint-1 owner-jiao
+Story,"PARK-01 Room allocation, clash checks, 15-minute gaps and Room 3 capacity",Parked product backlog,"As a stakeholder, I want rooms, room-clash detection, the 15-minute turnaround and Room 3 capacity rules, so that the centre schedule respects physical rooms.
+
+Acceptance criteria (future):
+- Rooms selectable per session
+- Clashes, gaps and capacity rules enforced
+- Rooms shown on schedule views
+
+Parked reason: Rooms excluded from the fixed sprint scope; schedule is tutor-based this sprint.",,Low,parked out-of-scope-sprint-1
+Story,PARK-02 Overlapping/double-booking detection across tutors,Parked product backlog,"As a stakeholder, I want warnings when sessions overlap for the same student or tutor, so that double bookings like the June incident cannot recur.
+
+Acceptance criteria (future):
+- Overlap detection on create and move
+- Warning or refusal with reason
+
+Parked reason: Explicitly out of scope; redesign with the room model in a later epic.",,Low,parked out-of-scope-sprint-1
+Story,"PARK-03 Invoicing, rates and prepaid ten-session packs",Parked product backlog,"As a stakeholder, I want fees, hourly rates and prepaid pack balances such as Kai's ten-pack, so that billing matches what families owe.
+
+Acceptance criteria (future):
+- Pack purchase and balance tracking
+- Rate tables
+- Invoice records
+
+Parked reason: Billing is explicitly out of scope; payment noted on paper for now.",,Low,parked out-of-scope-sprint-1
+Story,PARK-04 Online payment and parent top-ups,Parked product backlog,"As a stakeholder, I want online card payment for sessions and packs, so that families can self-serve payment.
+
+Acceptance criteria (future):
+- Payment vendor integration
+- Receipts and reconciliation
+
+Parked reason: Out of scope; requires vendor selection, security and compliance work.",,Low,parked out-of-scope-sprint-1
+Story,"PARK-05 Tutor timesheets, payroll and no-show payment rules",Parked product backlog,"As a stakeholder, I want worked-hour and payroll reports for casual tutors, so that Helen can pay tutors accurately.
+
+Acceptance criteria (future):
+- Timesheet export
+- No-show payment policy applied
+
+Parked reason: Out of scope; session statuses are recorded only.",,Low,parked out-of-scope-sprint-1
+Story,PARK-06 Email and SMS reminders and cancellation notices,Parked product backlog,"As a stakeholder, I want automatic reminders and cancellation notifications, so that tutors stop arriving for cancelled sessions.
+
+Acceptance criteria (future):
+- Reminder templates and opt-in
+- Cancellation notices on status change
+
+Parked reason: Out of scope; needs messaging vendor and consent handling.",,Low,parked out-of-scope-sprint-1
+Story,PARK-07 Parent self-service portal,Parked product backlog,"As a stakeholder, I want parents to view bookings and request changes themselves, so that front-desk call volume drops.
+
+Acceptance criteria (future):
+- Authenticated parent access
+- Booking request workflow
+
+Parked reason: Out of scope; needs accounts, roles and privacy design (PARK-13).",,Low,parked out-of-scope-sprint-1
+Story,PARK-08 Video-session links and attendance,Parked product backlog,"As a stakeholder, I want video links recorded for any online sessions, so that online sessions are supported if introduced.
+
+Acceptance criteria (future):
+- Link field and attendance by link
+
+Parked reason: Out of scope; the centre is in-person.",,Low,parked out-of-scope-sprint-1
+Story,PARK-09 Blue card expiry tracking and alerts,Parked product backlog,"As a stakeholder, I want tutor blue-card numbers and expiry dates with alerts, so that the centre never schedules an unverified tutor.
+
+Acceptance criteria (future):
+- Compliance fields
+- Expiry dashboard and alerts
+
+Parked reason: Out of scope; standalone compliance workflow.",,Low,parked out-of-scope-sprint-1
+Story,"PARK-10 Accountant export, utilisation and inactive-student reports",Parked product backlog,"As a stakeholder, I want Xero/accountant exports, utilisation and three-week-inactivity reports, so that Helen gets the commercial visibility she asked for.
+
+Acceptance criteria (future):
+- Scheduled exports
+- Utilisation and inactivity reports
+
+Parked reason: Out of scope; reporting epic after core scheduling stabilises.",,Low,parked out-of-scope-sprint-1
+Story,PARK-11 Tutor post-session notes,Parked product backlog,"As a stakeholder, I want tutors to record what was covered and homework set, so that next sessions pick up where the last one ended.
+
+Acceptance criteria (future):
+- Notes per session, visible to tutors
+- History on student view
+
+Parked reason: Future enhancement requested by Tomas; sessions stay minimal this sprint.",,Low,parked out-of-scope-sprint-1
+Story,PARK-12 January intensive and NAPLAN workshop scheduling,Parked product backlog,"As a stakeholder, I want different day patterns for the January intensive and workshops, so that term and holiday patterns coexist.
+
+Acceptance criteria (future):
+- Term-pattern calendar
+- Workshop enrolment blocks
+
+Parked reason: Different scheduling model; design after weekly scheduling is proven.",,Low,parked out-of-scope-sprint-1
+Story,"PARK-13 User accounts, roles, authentication and security hardening",Parked product backlog,"As a stakeholder, I want individual logins with role-based access, so that children's and families' personal data is protected.
+
+Acceptance criteria (future):
+- Login, roles (owner/desk/tutor)
+- Tutor data scoping enforced server-side
+- Audit log
+
+Parked reason: Sprint assumes a trusted front-desk device; required before any multi-user release.",,Low,parked out-of-scope-sprint-1

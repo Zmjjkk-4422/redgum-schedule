@@ -1,0 +1,43 @@
+{
+  "tutors": [
+    {
+      "name": "Tomas Ferreira",
+      "subjects": "Physics, Chemistry, Math Methods",
+      "max_sessions_week": 8,
+      "windows": [
+        {"weekday": 2, "start_time": "15:30", "end_time": "19:00", "note": "Term 3 2026 availability card"},
+        {"weekday": 3, "start_time": "15:30", "end_time": "18:00", "note": "Term 3 2026 availability card"},
+        {"weekday": 4, "start_time": "16:00", "end_time": "18:30", "note": "Amended 21 July (previously 15:00 start)"},
+        {"weekday": 6, "start_time": "09:00", "end_time": "12:30", "note": "Term 3 2026 availability card"}
+      ]
+    },
+    {
+      "name": "Helen Vasquez",
+      "subjects": "Math Methods, Specialist Mathematics",
+      "max_sessions_week": null,
+      "windows": []
+    }
+  ],
+  "students": [
+    {"name": "Ella Nguyen", "year_level": 11, "contact_name": "Mrs Nguyen", "contact_phone": "", "contact_email": "", "subjects": "Physics"},
+    {"name": "Jayden Pike", "year_level": 10, "contact_name": "Pike family", "contact_phone": "", "contact_email": "", "subjects": "Maths"},
+    {"name": "Sara Habib", "year_level": 12, "contact_name": "Habib family", "contact_phone": "", "contact_email": "", "subjects": "Chemistry"},
+    {"name": "Oliver Brandt", "year_level": 9, "contact_name": "Brandt family", "contact_phone": "", "contact_email": "", "subjects": "Maths"},
+    {"name": "Mia Okafor", "year_level": 12, "contact_name": "Okafor family", "contact_phone": "", "contact_email": "", "subjects": "Physics"},
+    {"name": "Kai Lombardo", "year_level": 11, "contact_name": "Gina Lombardo (mother)", "contact_phone": "0418 330 297", "contact_email": "", "subjects": "Physics, Math Methods"}
+  ],
+  "sessions": [
+    {"tutor": "Tomas Ferreira", "student": "Ella Nguyen", "subject": "Physics", "session_date": "2026-08-11", "start_time": "15:30", "length_minutes": 60, "status": "cancelled"},
+    {"tutor": "Tomas Ferreira", "student": "Oliver Brandt", "subject": "Maths", "session_date": "2026-08-11", "start_time": "16:30", "length_minutes": 60, "status": "missed"},
+    {"tutor": "Tomas Ferreira", "student": "Sara Habib", "subject": "Chemistry", "session_date": "2026-08-12", "start_time": "16:00", "length_minutes": 60, "status": "attended"},
+    {"tutor": "Tomas Ferreira", "student": "Mia Okafor", "subject": "Physics", "session_date": "2026-08-12", "start_time": "17:30", "length_minutes": 60, "status": "attended"},
+    {"tutor": "Tomas Ferreira", "student": "Jayden Pike", "subject": "Maths", "session_date": "2026-08-13", "start_time": "18:30", "length_minutes": 60, "status": "cancelled"},
+    {"tutor": "Tomas Ferreira", "student": "Jayden Pike", "subject": "Maths", "session_date": "2026-08-15", "start_time": "09:00", "length_minutes": 60, "status": "booked"}
+  ],
+  "notes": [
+    "Sample data transcribed from Redgum case-study Documents A-C (Term 3 availability card, Week 5 diary 11-15 Aug 2026, enrolment S-0311). Fictional data for assessment use only.",
+    "Jayden Pike's Thursday 18:30 session was moved to Saturday 09:00 (make-up), matching the diary annotation.",
+    "Kai Lombardo cannot do Fridays; the ten-session pack and payment are billing data and are intentionally out of scope.",
+    "Tomas's Week 8 engineering placement (31 Aug - 4 Sep) is a one-off exception, not a weekly window, and is not modelled."
+  ]
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-2">{{ title }}</h1>
+<div class="alert alert-info">
+  <strong>Sprint status:</strong> {{ jira_ids }} &middot; owner {{ owner }}.
+  The domain logic and tests for this feature are in the repository; the web
+  interface is delivered on its story-named feature branch during the sprint.
+</div>
+{% for story_title, criteria in criteria %}
+<h2 class="h5 mt-4">{{ story_title }} &mdash; acceptance criteria</h2>
+<ul>
+  {% for c in criteria %}<li>{{ c }}</li>{% endfor %}
+</ul>
+{% endfor %}
+<p class="text-muted small">
+  See docs/product-backlog.md and the Jira sprint board for the full story
+  descriptions and story-point justification.
+</p>
+{% endblock %}

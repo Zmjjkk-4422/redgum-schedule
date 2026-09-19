@@ -1,0 +1,19 @@
+/* Redgum Schedule - small mobile-usability adjustments on top of Bootstrap. */
+body {
+  font-size: 1rem;
+}
+.table {
+  font-size: 0.95rem;
+}
+/* Larger tap targets for phone use (tutor request: "don't make it awful on a phone"). */
+.btn {
+  min-height: 38px;
+}
+@media (max-width: 575.98px) {
+  .display-6 {
+    font-size: 1.6rem;
+  }
+  .table {
+    font-size: 0.88rem;
+  }
+}

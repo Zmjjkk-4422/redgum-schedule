@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Redgum Schedule &middot; Home{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Redgum Tutoring scheduling system</h1>
+<p class="text-muted">
+  One shared, persistent schedule for students, tutors and sessions, replacing
+  the whiteboard, paper diary and corkboard availability cards.
+</p>
+<div class="row g-3">
+  <div class="col-6 col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ student_count }}</div>
+        <div class="text-muted">students</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ tutor_count }}</div>
+        <div class="text-muted">tutors</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center">
+      <div class="card-body">
+        <div class="display-6">{{ session_count }}</div>
+        <div class="text-muted">sessions recorded</div>
+        <a class="stretched-link" href="{{ url_for('sessions.index') }}"></a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
