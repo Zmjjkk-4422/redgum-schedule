@@ -21,10 +21,12 @@ def create_app(config_name=None, test_config=None):
     register_commands(app)
 
     from .routes.students import bp as students_bp
+    from .routes.tutors import bp as tutors_bp
     from .routes.sessions import bp as sessions_bp
     from .routes.schedule import bp as schedule_bp
 
     app.register_blueprint(students_bp)
+    app.register_blueprint(tutors_bp)
     app.register_blueprint(sessions_bp)
     app.register_blueprint(schedule_bp)
 
