@@ -9,13 +9,22 @@
 <div class="table-responsive">
   <table class="table table-striped align-middle">
     <thead>
-      <tr><th>Name</th><th>Subjects</th><th>Status</th><th></th></tr>
+      <tr><th>Name</th><th>Subjects</th><th>Weekly availability</th><th>Status</th><th></th></tr>
     </thead>
     <tbody>
     {% for t in tutors %}
       <tr>
         <td>{{ t.name }}</td>
         <td>{{ t.subjects }}</td>
+        <td>
+          {% for w in windows_by_tutor.get(t.id, []) %}
+            <span class="badge text-bg-light border me-1">
+              {{ weekday_names[w.weekday] }} {{ w.start_time }}–{{ w.end_time }}
+            </span>
+          {% else %}
+            <span class="text-muted">No windows set</span>
+          {% endfor %}
+        </td>
         <td>
           {% if t.status == 'active' %}
             <span class="badge text-bg-success">active</span>
@@ -24,6 +33,7 @@
           {% endif %}
         </td>
         <td class="text-end text-nowrap">
+          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('tutors.availability', tutor_id=t.id) }}">Availability</a>
           <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('tutors.edit', tutor_id=t.id) }}">Edit</a>
           {% if t.status == 'active' %}
           <form method="post" action="{{ url_for('tutors.set_status', tutor_id=t.id, action='deactivate') }}" class="d-inline">

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Availability – {{ tutor.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Availability windows – {{ tutor.name }}</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('tutors.index') }}">Back to tutors</a>
+</div>
+<p class="text-muted">
+  A session can only be booked when it falls entirely inside one of the windows
+  below for that weekday. Windows can be added, changed (remove then re-add) and
+  removed at any time.
+</p>
+
+<div class="table-responsive mb-4">
+  <table class="table align-middle">
+    <thead><tr><th>Weekday</th><th>Start</th><th>End</th><th>Note</th><th></th></tr></thead>
+    <tbody>
+    {% for w in windows %}
+      <tr>
+        <td>{{ weekday_names[w.weekday] }}</td>
+        <td>{{ w.start_time }}</td>
+        <td>{{ w.end_time }}</td>
+        <td class="text-muted">{{ w.note }}</td>
+        <td class="text-end">
+          <form method="post" action="{{ url_for('tutors.delete_window', window_id=w.id) }}" class="d-inline">
+            <button class="btn btn-outline-danger btn-sm">Remove</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="text-muted">No availability windows yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 class="h5">Add a window</h2>
+<form method="post" class="row g-2 align-items-end" style="max-width: 900px;">
+  <div class="col-md-3">
+    <label class="form-label" for="weekday">Weekday *</label>
+    <select class="form-select" id="weekday" name="weekday" required>
+      {% for num, name in weekday_names.items() %}
+        <option value="{{ num }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label" for="start_time">Start *</label>
+    <input class="form-control" id="start_time" name="start_time" type="time" required>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label" for="end_time">End *</label>
+    <input class="form-control" id="end_time" name="end_time" type="time" required>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label" for="note">Note</label>
+    <input class="form-control" id="note" name="note" placeholder="e.g. amended 21 July">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100">Add window</button>
+  </div>
+</form>
+{% endblock %}
