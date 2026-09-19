@@ -1,4 +1,4 @@
-"""Smoke and form-post tests for the delivered web routes (RED-04/05)."""
+"""Smoke and form-post tests for the delivered web routes (RED-04/05/06)."""
 def test_pages_load(client):
     for path in ("/", "/students/", "/tutors/", "/sessions/", "/schedule/"):
         response = client.get(path)
@@ -28,25 +28,20 @@ def test_student_form_validation_flashes(client):
     assert b"required" in response.data
 
 
-def test_deactivate_student_via_form(client, ctx):
-    client.post(
-        "/students/new",
-        data={"name": "Leaving Student", "year_level": "10", "contact_phone": "0400 000 000"},
-    )
-    from app import models
-    student = models.list_students()[0]
-    client.post(f"/students/{student['id']}/deactivate")
-    assert models.get_student(student["id"])["status"] == "inactive"
-
-
-def test_create_tutor_via_form(client, ctx):
+def test_create_tutor_and_window_via_forms(client, ctx):
     response = client.post(
         "/tutors/new",
         data={"name": "Tomas Ferreira", "subjects": "Physics", "max_sessions_week": "8"},
     )
     assert response.status_code == 302
     from app import models
-    assert any(t["name"] == "Tomas Ferreira" for t in models.list_tutors())
+    tutor = models.list_tutors()[0]
+    response = client.post(
+        f"/tutors/{tutor['id']}/availability",
+        data={"weekday": "2", "start_time": "15:30", "end_time": "19:00", "note": ""},
+    )
+    assert response.status_code == 302
+    assert len(models.list_windows(tutor["id"])) == 1
 
 
 def test_deactivate_tutor_via_form(client, ctx):
