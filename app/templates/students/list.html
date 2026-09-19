@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Students</h1>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('students.new') }}">New student</a>
+</div>
+{% if students %}
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr><th>Name</th><th>Year</th><th>Subjects</th><th>Family contact</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for s in students %}
+      <tr>
+        <td><a href="{{ url_for('students.detail', student_id=s.id) }}">{{ s.name }}</a></td>
+        <td>{{ s.year_level }}</td>
+        <td>{{ s.subjects }}</td>
+        <td>
+          {% if s.contact_phone %}{{ s.contact_phone }}<br>{% endif %}
+          {% if s.contact_email %}<span class="text-muted">{{ s.contact_email }}</span>{% endif %}
+        </td>
+        <td>
+          {% if s.status == 'active' %}
+            <span class="badge text-bg-success">active</span>
+          {% else %}
+            <span class="badge text-bg-secondary">inactive</span>
+          {% endif %}
+        </td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('students.edit', student_id=s.id) }}">Edit</a>
+          {% if s.status == 'active' %}
+          <form method="post" action="{{ url_for('students.set_status', student_id=s.id, action='deactivate') }}" class="d-inline">
+            <button class="btn btn-outline-warning btn-sm">Deactivate</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('students.set_status', student_id=s.id, action='activate') }}" class="d-inline">
+            <button class="btn btn-outline-success btn-sm">Reactivate</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No students yet. <a href="{{ url_for('students.new') }}">Add the first student</a>.</p>
+{% endif %}
+{% endblock %}

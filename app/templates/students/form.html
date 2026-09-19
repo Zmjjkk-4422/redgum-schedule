@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% if student %}Edit student{% else %}New student{% endif %}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">{% if student %}Edit student: {{ student.name }}{% else %}New student{% endif %}</h1>
+<form method="post" class="row g-3" style="max-width: 720px;">
+  <div class="col-md-8">
+    <label class="form-label" for="name">Full name *</label>
+    <input class="form-control" id="name" name="name" required value="{{ data.name or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="year_level">Year level (5–12) *</label>
+    <input class="form-control" id="year_level" name="year_level" type="number" min="5" max="12" required value="{{ data.year_level or '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="contact_name">Family contact name</label>
+    <input class="form-control" id="contact_name" name="contact_name" value="{{ data.contact_name or '' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label" for="contact_phone">Contact phone</label>
+    <input class="form-control" id="contact_phone" name="contact_phone" value="{{ data.contact_phone or '' }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label" for="contact_email">Contact email</label>
+    <input class="form-control" id="contact_email" name="contact_email" type="email" value="{{ data.contact_email or '' }}">
+  </div>
+  <div class="col-12">
+    <label class="form-label" for="subjects">Subjects (comma separated)</label>
+    <input class="form-control" id="subjects" name="subjects" placeholder="e.g. Physics, Math Methods" value="{{ data.subjects or '' }}">
+    <div class="form-text">Phone or email is required so the front desk can reach the family.</div>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">{% if student %}Save changes{% else %}Create student{% endif %}</button>
+    <a class="btn btn-link" href="{{ url_for('students.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
