@@ -44,6 +44,17 @@ def test_create_tutor_and_window_via_forms(client, ctx):
     assert len(models.list_windows(tutor["id"])) == 1
 
 
+def test_tutor_list_renders_with_windows(client, ctx):
+    # Regression: the tutor list page renders availability badges.
+    client.post("/tutors/new", data={"name": "Tomas Ferreira", "subjects": "Physics"})
+    from app import models
+    tutor = models.list_tutors()[0]
+    models.add_window(tutor["id"], {"weekday": "2", "start_time": "15:30", "end_time": "19:00"})
+    response = client.get("/tutors/")
+    assert response.status_code == 200
+    assert b"Tuesday" in response.data
+
+
 def test_deactivate_tutor_via_form(client, ctx):
     client.post("/tutors/new", data={"name": "Temp Tutor", "subjects": "Maths"})
     from app import models
