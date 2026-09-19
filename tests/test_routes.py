@@ -1,6 +1,6 @@
-"""Smoke and form-post tests for the student web routes (RED-04)."""
+"""Smoke and form-post tests for the delivered web routes (RED-04/05)."""
 def test_pages_load(client):
-    for path in ("/", "/students/", "/sessions/", "/schedule/"):
+    for path in ("/", "/students/", "/tutors/", "/sessions/", "/schedule/"):
         response = client.get(path)
         assert response.status_code == 200, path
 
@@ -37,3 +37,21 @@ def test_deactivate_student_via_form(client, ctx):
     student = models.list_students()[0]
     client.post(f"/students/{student['id']}/deactivate")
     assert models.get_student(student["id"])["status"] == "inactive"
+
+
+def test_create_tutor_via_form(client, ctx):
+    response = client.post(
+        "/tutors/new",
+        data={"name": "Tomas Ferreira", "subjects": "Physics", "max_sessions_week": "8"},
+    )
+    assert response.status_code == 302
+    from app import models
+    assert any(t["name"] == "Tomas Ferreira" for t in models.list_tutors())
+
+
+def test_deactivate_tutor_via_form(client, ctx):
+    client.post("/tutors/new", data={"name": "Temp Tutor", "subjects": "Maths"})
+    from app import models
+    tutor = models.list_tutors()[0]
+    client.post(f"/tutors/{tutor['id']}/deactivate")
+    assert models.get_tutor(tutor["id"])["status"] == "inactive"
