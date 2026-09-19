@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Tutors{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Tutors</h1>
+  <a class="btn btn-primary btn-sm" href="{{ url_for('tutors.new') }}">New tutor</a>
+</div>
+{% if tutors %}
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr><th>Name</th><th>Subjects</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for t in tutors %}
+      <tr>
+        <td>{{ t.name }}</td>
+        <td>{{ t.subjects }}</td>
+        <td>
+          {% if t.status == 'active' %}
+            <span class="badge text-bg-success">active</span>
+          {% else %}
+            <span class="badge text-bg-secondary">inactive</span>
+          {% endif %}
+        </td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('tutors.edit', tutor_id=t.id) }}">Edit</a>
+          {% if t.status == 'active' %}
+          <form method="post" action="{{ url_for('tutors.set_status', tutor_id=t.id, action='deactivate') }}" class="d-inline">
+            <button class="btn btn-outline-warning btn-sm">Deactivate</button>
+          </form>
+          {% else %}
+          <form method="post" action="{{ url_for('tutors.set_status', tutor_id=t.id, action='activate') }}" class="d-inline">
+            <button class="btn btn-outline-success btn-sm">Reactivate</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No tutors yet. <a href="{{ url_for('tutors.new') }}">Add the first tutor</a>.</p>
+{% endif %}
+{% endblock %}
