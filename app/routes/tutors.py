@@ -14,7 +14,10 @@ def index():
     for window in windows:
         by_tutor.setdefault(window["tutor_id"], []).append(window)
     return render_template(
-        "tutors/list.html", tutors=tutors, windows_by_tutor=by_tutor
+        "tutors/list.html",
+        tutors=tutors,
+        windows_by_tutor=by_tutor,
+        weekday_names=models.WEEKDAY_NAMES,
     )
 
 
