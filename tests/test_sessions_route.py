@@ -71,3 +71,22 @@ def test_booked_session_appears_on_day_list(client, tutor_with_windows, active_s
     body = resp.get_data(as_text=True)
     assert active_student["name"] in body
     assert "booked" in body
+
+
+def test_book_90min_running_past_window_close_refused(client, tutor_with_windows, active_student):
+    # Tuesday window ends 19:00; 18:00 + 90 min ends 19:30 -> must be refused.
+    resp = client.post(
+        "/sessions/book",
+        data=_form(active_student, tutor_with_windows, start="18:00", length="90"),
+    )
+    assert resp.status_code == 200
+    assert models.count_sessions() == 0
+
+
+def test_deactivated_student_and_tutor_not_in_selects(client, tutor_with_windows, active_student):
+    models.set_student_status(active_student["id"], "inactive")
+    models.set_tutor_status(tutor_with_windows["id"], "inactive")
+    resp = client.get("/sessions/book")
+    body = resp.get_data(as_text=True)
+    assert active_student["name"] not in body
+    assert tutor_with_windows["name"] not in body
