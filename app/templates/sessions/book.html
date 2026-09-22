@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Book a session{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Book a session</h1>
+<form method="post" class="row g-3" style="max-width: 720px;">
+  <div class="col-md-6">
+    <label class="form-label" for="student_id">Student *</label>
+    <select class="form-select" id="student_id" name="student_id" required>
+      <option value="">Choose an active student…</option>
+      {% for s in students %}
+      <option value="{{ s.id }}" {% if data.student_id == s.id|string %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="tutor_id">Tutor *</label>
+    <select class="form-select" id="tutor_id" name="tutor_id" required>
+      <option value="">Choose an active tutor…</option>
+      {% for t in tutors %}
+      <option value="{{ t.id }}" {% if data.tutor_id == t.id|string %}selected{% endif %}>{{ t.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="session_date">Date *</label>
+    <input class="form-control" id="session_date" name="session_date" type="date" required value="{{ data.session_date or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="start_time">Start time *</label>
+    <input class="form-control" id="start_time" name="start_time" type="time" required value="{{ data.start_time or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="length_minutes">Length *</label>
+    <select class="form-select" id="length_minutes" name="length_minutes" required>
+      {% for l in [60, 90] %}
+      <option value="{{ l }}" {% if data.length_minutes == l|string %}selected{% endif %}>{{ l }} minutes</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12">
+    <label class="form-label" for="subject">Subject</label>
+    <input class="form-control" id="subject" name="subject" placeholder="e.g. Physics" value="{{ data.subject or '' }}">
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Book session</button>
+    <a class="btn btn-link" href="{{ url_for('sessions.index') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
