@@ -109,16 +109,17 @@ redgum-schedule/
 
 | Jira | Feature | Owner | Status |
 |---|---|---|---|
-| RED-01/02/03 | Scaffold, data model, availability rule | Team / Max | In repository (foundation) |
+| RED-01/02/03 | Scaffold, data model, availability rule | Han | In repository (foundation) |
 | RED-04/05/06 | Students, tutors, availability windows | Han | In repository |
-| RED-07/08 | Session booking, move/cancel UI | Max | Service ready; web UI on feature branches |
+| RED-07/08/13/14 | Session booking, move/cancel, weekly cap, overlap guard | Max | Service ready; web UI on feature branches |
 | RED-09/10/11 | Schedule views, seed polish, mobile pass | Jiao | Planned |
-| RED-12 | Test plan, traceability, evidence | Jiao | Planned |
+| RED-12/15 | Test plan, traceability, evidence, change-impact warning | Jiao | Planned |
 
 See [docs/product-backlog.md](docs/product-backlog.md) and the Jira board.
 
 ## Team
 
-Han (25259463), Max (25259298), Jiao (25258826) — ISYS3001 Team [Team No.].
-Each member pushes only from their own GitHub account; Assessment 2 reports
-are written individually.
+Han (Zmjjkk-4422), Max (Max-25259298), Jiao (Jiao-25258826) — ISYS3001 Team
+[Team No.]. Each member pushes only from their own GitHub account; Assessment
+2 reports are written individually. No student numbers or personal contact
+details are stored in this repository.
