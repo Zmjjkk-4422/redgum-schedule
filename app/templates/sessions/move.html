@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Move session{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Move session</h1>
+<p class="text-muted">
+  {{ session.student_name }} with {{ session.tutor_name }}{% if session.subject %} · {{ session.subject }}{% endif %}
+  &mdash; currently {{ session.session_date }} at {{ session.start_time }} ({{ session.length_minutes }} min).
+</p>
+<form method="post" class="row g-3" style="max-width: 720px;">
+  <div class="col-md-4">
+    <label class="form-label" for="session_date">New date *</label>
+    <input class="form-control" id="session_date" name="session_date" type="date" required value="{{ data.session_date or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="start_time">New start time *</label>
+    <input class="form-control" id="start_time" name="start_time" type="time" required value="{{ data.start_time or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="length_minutes">Length *</label>
+    <select class="form-select" id="length_minutes" name="length_minutes" required>
+      {% for l in [60, 90] %}
+      <option value="{{ l }}" {% if data.length_minutes == l|string %}selected{% endif %}>{{ l }} minutes</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Move session</button>
+    <a class="btn btn-link" href="{{ url_for('sessions.index', date=session.session_date) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
