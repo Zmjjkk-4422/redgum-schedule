@@ -1,4 +1,6 @@
-"""Student record routes (Jira RED-04, owner: Han)."""
+"""Student record routes (Jira RED-04, owner: Han; RED-10 history split, owner: Jiao)."""
+from datetime import date
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from .. import models
@@ -31,8 +33,17 @@ def detail(student_id):
     if student is None:
         flash("Student not found.", "danger")
         return redirect(url_for("students.index"))
-    sessions = models.list_sessions(student_id=student_id)
-    return render_template("students/detail.html", student=student, sessions=sessions)
+    all_sessions = models.list_sessions(student_id=student_id)
+    today = date.today().isoformat()
+    upcoming = [s for s in all_sessions if s["session_date"] >= today]
+    past = [s for s in all_sessions if s["session_date"] < today]
+    return render_template(
+        "students/detail.html",
+        student=student,
+        sessions=all_sessions,
+        upcoming_sessions=upcoming,
+        past_sessions=past,
+    )
 
 
 @bp.route("/<int:student_id>/edit", methods=("GET", "POST"))
