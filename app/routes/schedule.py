@@ -1,32 +1,57 @@
 """Schedule view routes (Jira RED-09/10, owner: Jiao).
 
-Delivered on feature/RED-09-schedule-views and
-feature/RED-10-tutor-student-views during Sprint Weeks 2-3.
+RED-09: centre day/week schedule view, mobile-friendly.
+RED-10: tutor upcoming / student history views (later branch).
 """
-from flask import Blueprint, render_template
+from datetime import date, timedelta
+
+from flask import Blueprint, render_template, request
+
+from app import models
 
 bp = Blueprint("schedule", __name__, url_prefix="/schedule")
 
-ACCEPTANCE_CRITERIA = [
-    ("RED-09 Centre day/week schedule", [
-        "Choose a day or a week and see every session with student, tutor, subject, time, length and status.",
-        "Days with no sessions show an empty state, never an error.",
-        "The view is usable on a phone-width browser without horizontal scrolling.",
-    ]),
-    ("RED-10 Tutor and student views", [
-        "A tutor sees only their own upcoming sessions, soonest first; none shows an empty state.",
-        "A student record shows past and future sessions in date order.",
-        "Cancelled sessions remain visible and are clearly marked.",
-    ]),
-]
+
+def _parse_date(value):
+    """Parse YYYY-MM-DD; fall back to today on anything malformed."""
+    try:
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return date.today()
+
+
+def _monday_of(day):
+    """Return the Monday on or before the given date."""
+    return day - timedelta(days=day.isoweekday() - 1)
 
 
 @bp.route("/")
 def index():
+    view = request.args.get("view", "day")
+    if view not in ("day", "week"):
+        view = "day"
+    day = _parse_date(request.args.get("date"))
+
+    if view == "day":
+        sessions = models.list_sessions(date=day.isoformat())
+        period_label = day.strftime("%A, %d %B %Y")
+        prev_date = day - timedelta(days=1)
+        next_date = day + timedelta(days=1)
+    else:
+        start = _monday_of(day)
+        end = start + timedelta(days=6)
+        sessions = models.list_sessions(date=(start.isoformat(), end.isoformat()))
+        period_label = f"{start.strftime('%d %b')} – {end.strftime('%d %b %Y')}"
+        prev_date = start - timedelta(days=7)
+        next_date = start + timedelta(days=7)
+
     return render_template(
-        "coming_soon.html",
-        title="Schedule views",
-        jira_ids="RED-09 / RED-10",
-        owner="Jiao (Member C)",
-        criteria=ACCEPTANCE_CRITERIA,
+        "schedule/index.html",
+        title="Centre schedule",
+        view=view,
+        day=day,
+        period_label=period_label,
+        sessions=sessions,
+        prev_date=prev_date.isoformat(),
+        next_date=next_date.isoformat(),
     )
