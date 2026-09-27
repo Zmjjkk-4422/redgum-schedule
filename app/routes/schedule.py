@@ -55,3 +55,23 @@ def index():
         prev_date=prev_date.isoformat(),
         next_date=next_date.isoformat(),
     )
+
+
+@bp.route("/tutor/<int:tutor_id>")
+def tutor(tutor_id):
+    """RED-10: a tutor sees only their own upcoming sessions, soonest first."""
+    tutor = models.get_tutor(tutor_id)
+    if tutor is None:
+        return render_template("coming_soon.html", title="Tutor not found",
+                               jira_ids="RED-10", owner="Jiao (Member C)", criteria=[]), 404
+    today = date.today().isoformat()
+    upcoming = [
+        s for s in models.list_sessions(tutor_id=tutor_id)
+        if s["session_date"] >= today
+    ]
+    return render_template(
+        "schedule/tutor.html",
+        title=f"{tutor['name']} — upcoming",
+        tutor=tutor,
+        sessions=upcoming,
+    )
