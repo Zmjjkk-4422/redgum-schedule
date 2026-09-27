@@ -9,7 +9,7 @@
 <div class="table-responsive">
 <table class="table table-striped align-middle">
   <thead>
-    <tr><th>Date</th><th>Time</th><th>Length</th><th>Student</th><th>Tutor</th><th>Subject</th><th>Status</th></tr>
+    <tr><th>Date</th><th>Time</th><th>Length</th><th>Student</th><th>Tutor</th><th>Subject</th><th>Status</th><th>Actions</th></tr>
   </thead>
   <tbody>
   {% for s in sessions %}
@@ -21,6 +21,22 @@
       <td>{{ s.tutor_name }}</td>
       <td>{{ s.subject or '' }}</td>
       <td><span class="badge bg-secondary">{{ s.status }}</span></td>
+      <td class="text-nowrap">
+        {% if s.status == 'booked' %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('sessions.move', session_id=s.id) }}">Move</a>
+        <form class="d-inline" method="post" action="{{ url_for('sessions.status', session_id=s.id) }}">
+          <button class="btn btn-sm btn-outline-success" name="status" value="attended">Attended</button>
+        </form>
+        <form class="d-inline" method="post" action="{{ url_for('sessions.status', session_id=s.id) }}">
+          <button class="btn btn-sm btn-outline-warning" name="status" value="missed">Missed</button>
+        </form>
+        {% endif %}
+        {% if s.status != 'cancelled' %}
+        <form class="d-inline" method="post" action="{{ url_for('sessions.cancel', session_id=s.id) }}">
+          <button class="btn btn-sm btn-outline-danger">Cancel</button>
+        </form>
+        {% endif %}
+      </td>
     </tr>
   {% endfor %}
   </tbody>

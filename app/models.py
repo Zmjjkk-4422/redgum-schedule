@@ -5,7 +5,7 @@ Each create/update function validates required fields and returns
 lets the UI name the missing field instead of storing bad data.
 """
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .db import get_db
 
@@ -34,6 +34,15 @@ def normalise_time(value):
 def weekday_of(date_text):
     """ISO weekday (1=Monday ... 7=Sunday) for a YYYY-MM-DD date."""
     return datetime.strptime(date_text, "%Y-%m-%d").isoweekday()
+
+
+def iso_week_bounds(date_text):
+    """Return (monday, sunday) date objects for the ISO week (Mon-Sun) of the
+    given YYYY-MM-DD date. Shared by RED-13 (weekly cap) and RED-14
+    (overlap guard) so "one week" means the same thing in both stories."""
+    day = datetime.strptime(date_text, "%Y-%m-%d").date()
+    monday = day - timedelta(days=day.isoweekday() - 1)
+    return monday, monday + timedelta(days=6)
 
 
 # ---------------------------------------------------------------- students
@@ -304,6 +313,24 @@ def get_session(session_id):
 
 def count_sessions():
     return get_db().execute("SELECT COUNT(*) FROM sessions").fetchone()[0]
+
+
+def count_tutor_active_sessions(tutor_id, monday, sunday, exclude_session_id=None):
+    """Count a tutor's non-cancelled sessions inside one ISO week.
+
+    Cancelled sessions keep their record but do not count toward the weekly
+    cap; moved sessions are counted at their new date, so moving a session
+    out of a week frees that week's capacity.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM sessions WHERE tutor_id = ? "
+        "AND status != 'cancelled' AND session_date BETWEEN ? AND ?"
+    )
+    params = [tutor_id, monday.isoformat(), sunday.isoformat()]
+    if exclude_session_id is not None:
+        sql += " AND id != ?"
+        params.append(exclude_session_id)
+    return get_db().execute(sql, params).fetchone()[0]
 
 
 def insert_session(data, status="booked"):
