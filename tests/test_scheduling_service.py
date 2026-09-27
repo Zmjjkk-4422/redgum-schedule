@@ -99,3 +99,92 @@ def test_status_lifecycle(tutor_with_windows, active_student):
         mark_session_status(cancelled["id"], "attended")
     with pytest.raises(SchedulingError):
         move_session(cancelled["id"], "2026-09-19", "09:00", 60)
+
+
+# ------------------------------------------------------------- RED-13 weekly cap
+# ISO week Mon 2026-09-14 .. Sun 2026-09-20; 60-min slots fitting Tomas's windows.
+WEEK_SLOTS = [
+    ("2026-09-15", "15:30"),  # Tue window 15:30-19:00
+    ("2026-09-15", "16:30"),
+    ("2026-09-15", "17:30"),
+    ("2026-09-16", "15:30"),  # Wed window 15:30-18:00
+    ("2026-09-16", "16:30"),
+    ("2026-09-17", "16:00"),  # Thu window 16:00-18:30
+    ("2026-09-17", "17:00"),
+    ("2026-09-19", "09:00"),  # Sat window 09:00-12:30
+]
+
+
+def _book(student, tutor, date, start, length=60):
+    session, errors = create_session(_data(student, tutor, date=date, start=start, length=length))
+    assert errors == [], errors
+    return session
+
+
+def test_weekly_cap_refuses_ninth_booking_in_tomas_week(tutor_with_windows, active_student):
+    # Tomas has max_sessions_week = 8; the 9th booking in one ISO week is refused.
+    for date, start in WEEK_SLOTS:
+        _book(active_student, tutor_with_windows, date, start)
+    assert models.count_sessions() == 8
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-19", start="10:00")
+    )
+    assert session is None
+    assert any("cap" in e.lower() for e in errors)
+
+
+def test_cancelled_session_does_not_count_toward_cap(tutor_with_windows, active_student):
+    for date, start in WEEK_SLOTS:
+        _book(active_student, tutor_with_windows, date, start)
+    # Cancelling one frees a slot, even though the record stays.
+    cancel_session(models.list_sessions(date="2026-09-15")[0]["id"])
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-19", start="10:00")
+    )
+    assert errors == [], errors
+    assert session is not None
+
+
+def test_moving_into_full_week_refused_and_moving_out_frees_capacity(
+    tutor_with_windows, active_student
+):
+    for date, start in WEEK_SLOTS:
+        _book(active_student, tutor_with_windows, date, start)
+    # A spare session in the NEXT week.
+    spare = _book(active_student, tutor_with_windows, "2026-09-26", "09:00")
+    # Moving it into the already-full week must be refused.
+    with pytest.raises(SchedulingError):
+        move_session(spare["id"], "2026-09-19", "10:00", 60)
+    assert models.get_session(spare["id"])["session_date"] == "2026-09-26"
+    # Moving one session OUT of the full week frees a slot.
+    victim = models.list_sessions(date="2026-09-15")[0]
+    move_session(victim["id"], "2026-09-26", "10:00", 60)
+    # Now a booking in the previously-full week is accepted.
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-19", start="10:00")
+    )
+    assert errors == [], errors
+    assert session is not None
+
+
+def test_default_weekly_cap_is_twelve_without_tutor_limit(ctx, active_student):
+    # A tutor without max_sessions_week falls back to the centre default (12),
+    # which must be above Tomas's per-tutor limit of 8.
+    tutor, _ = models.create_tutor(
+        {"name": "Helen Vasquez", "subjects": "Math Methods", "max_sessions_week": ""}
+    )
+    for weekday, start, end in [
+        (2, "15:30", "19:00"), (3, "15:30", "18:00"),
+        (4, "16:00", "18:30"), (6, "09:00", "12:30"),
+    ]:
+        assert models.add_window(
+            tutor["id"],
+            {"weekday": str(weekday), "start_time": start, "end_time": end, "note": ""},
+        ) == []
+    for date, start in WEEK_SLOTS:
+        _book(active_student, tutor, date, start)
+    session, errors = create_session(
+        _data(active_student, tutor, date="2026-09-19", start="10:00")
+    )
+    assert errors == [], errors
+    assert session is not None

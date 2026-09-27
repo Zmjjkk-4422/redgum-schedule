@@ -11,6 +11,30 @@ class SchedulingError(ValueError):
     """Raised when a session command is invalid for non-availability reasons."""
 
 
+# Centre-wide default weekly cap (RED-13). A tutor may set their own
+# max_sessions_week on the tutor record, which overrides this default.
+DEFAULT_WEEKLY_CAP = 12
+
+
+def _check_weekly_cap(tutor, date_text, exclude_session_id=None):
+    """Refuse when the tutor already has their weekly session cap for the
+    ISO week (Mon-Sun) of date_text. Cancelled sessions do not count; the
+    moved session itself is excluded so a move within the same week still
+    occupies exactly one slot."""
+    monday, sunday = models.iso_week_bounds(date_text)
+    existing = models.count_tutor_active_sessions(
+        tutor["id"], monday, sunday, exclude_session_id
+    )
+    cap = tutor["max_sessions_week"] or DEFAULT_WEEKLY_CAP
+    if existing + 1 > cap:
+        raise SchedulingError(
+            f"{tutor['name']} already has {existing} session(s) in the week of "
+            f"{monday.isoformat()} to {sunday.isoformat()}; the weekly cap is "
+            f"{cap}. Choose a slot in another week, or move an existing session "
+            "out of this week."
+        )
+
+
 def _parse_date(date_text):
     try:
         return datetime.strptime(date_text, "%Y-%m-%d").date()
@@ -67,6 +91,11 @@ def create_session(data):
     except AvailabilityError as exc:
         return None, [str(exc)]
 
+    try:
+        _check_weekly_cap(tutor, date_text)
+    except SchedulingError as exc:
+        return None, [str(exc)]
+
     payload = dict(data)
     payload["session_date"] = date_text
     payload["start_time"] = start_time
@@ -96,6 +125,7 @@ def move_session(session_id, new_date, new_start, new_length=None):
 
     weekday = models.weekday_of(date_text)
     validate_booking(tutor, weekday, start_time, length)
+    _check_weekly_cap(tutor, date_text, exclude_session_id=session_id)
 
     from ..db import get_db
 

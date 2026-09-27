@@ -9,6 +9,9 @@ Semantic Versioning.
 ### Delivered (Sprint 1)
 - Session booking web flow with availability check (Max, RED-07) — merged via PR #6.
 - Session move, cancel and attended/missed status web flows (Max, RED-08).
+- Weekly tutor session cap enforced on booking and move: per-tutor
+  `max_sessions_week`, centre default 12, ISO week Mon-Sun, cancelled sessions
+  excluded (Max, RED-13).
 
 ### Planned (Sprint 1, remaining)
 - Centre day/week schedule, tutor and student views (Jiao, RED-09/10).
