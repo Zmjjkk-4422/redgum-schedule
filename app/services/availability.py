@@ -5,6 +5,7 @@ that tutor's availability windows for the weekday of the session date.
 Invalid bookings are refused with a plain-language reason; they are never
 accepted silently.
 """
+from .. import models
 from ..models import (
     WEEKDAY_NAMES,
     to_minutes,
@@ -78,3 +79,22 @@ def validate_booking(tutor, weekday, start_time, length_minutes):
         + "; ".join(f"{w['start_time']}\u2013{w['end_time']}" for w in windows)
         + "."
     )
+
+
+def find_stranded_bookings(tutor):
+    """RED-15: list BOOKED sessions that no longer fit any remaining window.
+
+    Called after a window is removed/shortened. Sessions are NEVER deleted
+    here; this only returns them so the UI can warn and the admin can move
+    or cancel them manually. Sessions still covered by another window are
+    not included."""
+    stranded = []
+    for session in models.list_sessions(tutor_id=tutor["id"]):
+        if session["status"] != "booked":
+            continue
+        weekday = models.weekday_of(session["session_date"])
+        if find_fitting_window(
+            tutor["id"], weekday, session["start_time"], session["length_minutes"]
+        ) is None:
+            stranded.append(session)
+    return stranded

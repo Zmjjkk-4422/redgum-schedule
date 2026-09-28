@@ -11,6 +11,30 @@
   removed at any time.
 </p>
 
+{% if stranded %}
+<div class="alert alert-warning" role="alert">
+  <strong>{{ stranded|length }} booked session(s) no longer fit any remaining window.</strong>
+  They are kept on the books (nothing is deleted automatically) — please move or cancel them:
+  <div class="table-responsive mt-2">
+    <table class="table table-sm align-middle mb-0">
+      <thead><tr><th>Date</th><th>Time</th><th>Length</th><th>Student</th></tr></thead>
+      <tbody>
+      {% for s in stranded %}
+        <tr>
+          <td>{{ s.session_date }}</td>
+          <td>{{ s.start_time }}</td>
+          <td>{{ s.length_minutes }} min</td>
+          <td>{{ s.student_name }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-success" role="alert">All booked sessions still fit a remaining window.</div>
+{% endif %}
+
 <div class="table-responsive mb-4">
   <table class="table align-middle">
     <thead><tr><th>Weekday</th><th>Start</th><th>End</th><th>Note</th><th></th></tr></thead>
