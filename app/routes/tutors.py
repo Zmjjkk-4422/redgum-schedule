@@ -1,7 +1,8 @@
-"""Tutor record and availability-window routes (Jira RED-05/06, owner: Han)."""
+"""Tutor record and availability-window routes (Jira RED-05/06, owner: Han; RED-15 impact warning, owner: Jiao)."""
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from .. import models
+from ..services.availability import find_stranded_bookings
 
 bp = Blueprint("tutors", __name__, url_prefix="/tutors")
 
@@ -80,6 +81,7 @@ def availability(tutor_id):
         tutor=tutor,
         windows=models.list_windows(tutor_id),
         weekday_names=models.WEEKDAY_NAMES,
+        stranded=find_stranded_bookings(tutor),
     )
 
 
