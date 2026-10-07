@@ -188,3 +188,81 @@ def test_default_weekly_cap_is_twelve_without_tutor_limit(ctx, active_student):
     )
     assert errors == [], errors
     assert session is not None
+
+
+# ------------------------------------------------------------- RED-14 overlap guard
+# Tuesday 2026-09-15, Tomas window 15:30-19:00.
+def test_overlapping_same_tutor_student_booking_refused(tutor_with_windows, active_student):
+    _book(active_student, tutor_with_windows, "2026-09-15", "16:00")
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-15", start="16:30")
+    )
+    assert session is None
+    assert any("already has a session" in e for e in errors)
+
+
+def test_touching_boundaries_are_allowed(tutor_with_windows, active_student):
+    # 16:00-17:00 then 17:00-18:00: back-to-back, no overlap.
+    _book(active_student, tutor_with_windows, "2026-09-15", "16:00")
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-15", start="17:00")
+    )
+    assert errors == [], errors
+    assert session is not None
+
+
+def test_overlap_guard_ignores_other_students(tutor_with_windows, active_student):
+    # Same tutor, different student at the same time: not the RED-14 conflict.
+    second, _ = models.create_student(
+        {"name": "Ella Nguyen", "year_level": "11", "contact_phone": "0400 000 000",
+         "subjects": "Physics"}
+    )
+    _book(active_student, tutor_with_windows, "2026-09-15", "16:00")
+    session, errors = create_session(
+        _data(second, tutor_with_windows, date="2026-09-15", start="16:30")
+    )
+    assert errors == [], errors
+    assert session is not None
+
+
+def test_overlap_guard_ignores_other_tutors(tutor_with_windows, active_student):
+    # Same student, different tutor at the same time: not the RED-14 conflict.
+    other_tutor, _ = models.create_tutor(
+        {"name": "Helen Vasquez", "subjects": "Math Methods", "max_sessions_week": ""}
+    )
+    for weekday, start, end in [(2, "15:30", "19:00")]:
+        assert models.add_window(
+            other_tutor["id"],
+            {"weekday": str(weekday), "start_time": start, "end_time": end, "note": ""},
+        ) == []
+    _book(active_student, tutor_with_windows, "2026-09-15", "16:00")
+    session, errors = create_session(
+        _data(active_student, other_tutor, date="2026-09-15", start="16:30")
+    )
+    assert errors == [], errors
+    assert session is not None
+
+
+def test_move_into_overlap_refused_but_touching_allowed(tutor_with_windows, active_student):
+    _book(active_student, tutor_with_windows, "2026-09-15", "16:00")
+    spare = _book(active_student, tutor_with_windows, "2026-09-26", "09:00")
+    # Moving into 16:30-17:30 overlaps the 16:00-17:00 session -> refused.
+    with pytest.raises(SchedulingError):
+        move_session(spare["id"], "2026-09-15", "16:30", 60)
+    assert models.get_session(spare["id"])["session_date"] == "2026-09-26"
+    # Moving into 17:00-18:00 touches the boundary -> allowed.
+    moved = move_session(spare["id"], "2026-09-15", "17:00", 60)
+    assert moved["session_date"] == "2026-09-15"
+    assert moved["start_time"] == "17:00"
+
+
+def test_cancelled_session_does_not_block_booking(tutor_with_windows, active_student):
+    first, _ = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-15", start="16:00")
+    )
+    cancel_session(first["id"])
+    session, errors = create_session(
+        _data(active_student, tutor_with_windows, date="2026-09-15", start="16:30")
+    )
+    assert errors == [], errors
+    assert session is not None
