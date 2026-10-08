@@ -333,6 +333,31 @@ def count_tutor_active_sessions(tutor_id, monday, sunday, exclude_session_id=Non
     return get_db().execute(sql, params).fetchone()[0]
 
 
+def find_overlapping_session(student_id, tutor_id, date_text,
+                             start_minutes, length, exclude_session_id=None):
+    """RED-14: return the active (non-cancelled) session of the SAME tutor and
+    student on date_text whose time interval overlaps [start_minutes,
+    start_minutes + length), or None.
+
+    Touching boundaries are allowed: a session ending exactly when another
+    starts does not overlap. Cancelled sessions are ignored.
+    """
+    rows = get_db().execute(
+        "SELECT * FROM sessions WHERE student_id = ? AND tutor_id = ? "
+        "AND session_date = ? AND status != 'cancelled'",
+        (student_id, tutor_id, date_text),
+    ).fetchall()
+    new_end = start_minutes + length
+    for row in rows:
+        if exclude_session_id is not None and row["id"] == exclude_session_id:
+            continue
+        row_start = to_minutes(row["start_time"])
+        row_end = row_start + row["length_minutes"]
+        if start_minutes < row_end and row_start < new_end:
+            return row
+    return None
+
+
 def insert_session(data, status="booked"):
     """Internal insert used by the scheduling service and seed data."""
     db = get_db()

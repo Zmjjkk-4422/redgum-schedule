@@ -35,6 +35,28 @@ def _check_weekly_cap(tutor, date_text, exclude_session_id=None):
         )
 
 
+def _check_overlap(student, tutor, date_text, start_time, length,
+                   exclude_session_id=None):
+    """RED-14: refuse when the SAME tutor already has an active session with
+    this student that overlaps the requested slot. Touching boundaries
+    (one ends exactly when the other starts) are allowed; cancelled sessions
+    are ignored. The moved session itself is excluded from the check."""
+    start_minutes = models.to_minutes(start_time)
+    clash = models.find_overlapping_session(
+        student["id"], tutor["id"], date_text,
+        start_minutes, length, exclude_session_id,
+    )
+    if clash is not None:
+        clash_start = models.to_minutes(clash["start_time"])
+        clash_end_min = clash_start + clash["length_minutes"]
+        clash_end = f"{clash_end_min // 60:02d}:{clash_end_min % 60:02d}"
+        raise SchedulingError(
+            f"{tutor['name']} already has a session with {student['name']} on "
+            f"{date_text} from {clash['start_time']} to {clash_end}. Pick a "
+            "non-overlapping slot (back-to-back sessions are allowed)."
+        )
+
+
 def _parse_date(date_text):
     try:
         return datetime.strptime(date_text, "%Y-%m-%d").date()
@@ -96,6 +118,11 @@ def create_session(data):
     except SchedulingError as exc:
         return None, [str(exc)]
 
+    try:
+        _check_overlap(student, tutor, date_text, start_time, length)
+    except SchedulingError as exc:
+        return None, [str(exc)]
+
     payload = dict(data)
     payload["session_date"] = date_text
     payload["start_time"] = start_time
@@ -126,6 +153,8 @@ def move_session(session_id, new_date, new_start, new_length=None):
     weekday = models.weekday_of(date_text)
     validate_booking(tutor, weekday, start_time, length)
     _check_weekly_cap(tutor, date_text, exclude_session_id=session_id)
+    _check_overlap(student, tutor, date_text, start_time, length,
+                   exclude_session_id=session_id)
 
     from ..db import get_db
 

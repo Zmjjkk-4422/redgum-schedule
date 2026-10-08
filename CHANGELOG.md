@@ -12,6 +12,9 @@ Semantic Versioning.
 - Weekly tutor session cap enforced on booking and move: per-tutor
   `max_sessions_week`, centre default 12, ISO week Mon-Sun, cancelled sessions
   excluded (Max, RED-13).
+- Overlap guard: a tutor cannot hold two active sessions with the same student
+  at overlapping times; touching (back-to-back) slots are allowed; enforced on
+  both booking and move (Max, RED-14).
 
 ### Planned (Sprint 1, remaining)
 - Centre day/week schedule, tutor and student views (Jiao, RED-09/10).
